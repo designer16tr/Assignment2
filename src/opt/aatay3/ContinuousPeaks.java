@@ -41,7 +41,7 @@ public class ContinuousPeaks {
 
 
         double start, end, time;
-        int[] iters = {10,100,500,1000,2500,5000,8000,10000};
+        int[] iters = {100, 600, 1100, 1600, 2100};
         int testRuns = 10;
 
         for (int iter : iters) {
@@ -79,8 +79,6 @@ public class ContinuousPeaks {
                 time /= Math.pow(10, 9);
                 sum_rhc += ef.value(rhc.getOptimal());
                 time_rhc += time;
-                //System.out.println("rhc: " + ef.value(rhc.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
                 SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .85, hcp);
@@ -91,10 +89,7 @@ public class ContinuousPeaks {
                 time /= Math.pow(10, 9);
                 sum_sa += ef.value(sa.getOptimal());
                 time_sa += time;
-                //System.out.println("sa: " + ef.value(sa.getOptimal()));
-                //System.out.println(time);
 
-                /**
                 start = System.nanoTime();
                 StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
                 fit = new FixedIterationTrainer(ga, iter);
@@ -103,9 +98,7 @@ public class ContinuousPeaks {
                 time = end - start;
                 time /= Math.pow(10, 9);
                 sum_ga += ef.value(ga.getOptimal());
-                time_ga += time;
-                //System.out.println("ga: " + ef.value(ga.getOptimal()));
-                //System.out.println(time);
+                time_ga += time;;
 
                 start = System.nanoTime();
                 MIMIC mimic = new MIMIC(200, 20, pop);
@@ -116,9 +109,6 @@ public class ContinuousPeaks {
                 time /= Math.pow(10, 9);
                 sum_mimic += ef.value(mimic.getOptimal());
                 time_mimic += time;
-                //System.out.println("Mimic: " + ef.value(mimic.getOptimal()));
-                //System.out.println(time);
-             **/
             }
 
             int average_rhc = sum_rhc / testRuns;
@@ -144,9 +134,9 @@ public class ContinuousPeaks {
                     "ga" + "," + iter + "," + Integer.toString(average_ga) + "," + Double.toString(averagetime_ga) + "," +
                     "mimic" + "," + iter + "," + Integer.toString(average_mimic) + "," + Double.toString(averagetime_mimic);
 
-            wotf.write_output_to_file("Optimization_Results", "continuousPeaks_results.csv", final_result, true);
+            wotf.write_output_to_file("Optimization_Results", "ContinuousPeaksexp.csv", final_result, true);
         }
-        /**
+        /**/
         double[] coolings = {0.05, 0.15, 0.25,0.35,0.45,0.55,0.65,0.75,0.85,0.95};
 
         for (int i = 0; i < coolings.length; i++){
@@ -165,7 +155,6 @@ public class ContinuousPeaks {
                 HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
                 GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
                 ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-                //System.out.println("this is test run # " + j);
 
                 start = System.nanoTime();
                 SimulatedAnnealing sa = new SimulatedAnnealing(1E11, coolings[i], hcp);
@@ -176,13 +165,9 @@ public class ContinuousPeaks {
                 time /= Math.pow(10, 9);
                 sum_sa += ef.value(sa.getOptimal());
                 time_sa += time;
-                //System.out.println("sa: " + ef.value(sa.getOptimal()));
-                //System.out.println(time);
 
             }
             int average_sa = sum_sa / testRuns;
-
-
             double averagetime_sa = time_sa / testRuns;
 
             System.out.println("##############");
@@ -194,8 +179,7 @@ public class ContinuousPeaks {
             final_result =
                     "mimic" + "," + Double.toString(coolings[i]) + "," + Integer.toString(average_sa) + "," + Double.toString(averagetime_sa);
 
-            write_output_to_file("Optimization_Results", "continuousPeaks_sa_results.csv", final_result, true);
+            wotf.write_output_to_file("Optimization_Results", "ContinuousPeaksexp.csv", final_result, true);
         }
-         **/
     }
 }

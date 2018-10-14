@@ -52,7 +52,7 @@ public class Knapsack {
 
 
         double start, end, time;
-        int[] iters = {10,100,500,1000,2500,5000};
+        int[] iters = {100, 600, 1100, 1600, 2100};
         int testRuns = 10;
 
 
@@ -72,10 +72,12 @@ public class Knapsack {
                 Arrays.fill(copies, COPIES_EACH);
                 double[] weights = new double[NUM_ITEMS];
                 double[] volumes = new double[NUM_ITEMS];
+                
                 for (int i = 0; i < NUM_ITEMS; i++) {
                     weights[i] = random.nextDouble() * MAX_WEIGHT;
                     volumes[i] = random.nextDouble() * MAX_VOLUME;
                 }
+                
                 int[] ranges = new int[NUM_ITEMS];
                 Arrays.fill(ranges, COPIES_EACH + 1);
                 EvaluationFunction ef = new KnapsackEvaluationFunction(weights, volumes, KNAPSACK_VOLUME, copies);
@@ -97,8 +99,6 @@ public class Knapsack {
                 time /= Math.pow(10, 9);
                 sum_rhc += ef.value(rhc.getOptimal());
                 time_rhc += time;
-                //System.out.println("rhc: " + ef.value(rhc.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
                 SimulatedAnnealing sa = new SimulatedAnnealing(1E11, .95, hcp);
@@ -109,9 +109,7 @@ public class Knapsack {
                 time /= Math.pow(10, 9);
                 sum_sa += ef.value(sa.getOptimal());
                 time_sa += time;
-                //System.out.println("sa: " + ef.value(sa.getOptimal()));
-                //System.out.println(time);
-
+                
                 start = System.nanoTime();
                 StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 100, 10, gap);
                 fit = new FixedIterationTrainer(ga, iter);
@@ -121,8 +119,6 @@ public class Knapsack {
                 time /= Math.pow(10, 9);
                 sum_ga += ef.value(ga.getOptimal());
                 time_ga += time;
-                //System.out.println("ga: " + ef.value(ga.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
                 MIMIC mimic = new MIMIC(200, 20, pop);
@@ -133,8 +129,6 @@ public class Knapsack {
                 time /= Math.pow(10, 9);
                 sum_mimic += ef.value(mimic.getOptimal());
                 time_mimic += time;
-                //System.out.println("Mimic: " + ef.value(mimic.getOptimal()));
-                //System.out.println(time);
 
             }
 
@@ -162,7 +156,7 @@ public class Knapsack {
                             "ga" + "," + iter + "," + Integer.toString(average_ga) + "," + Double.toString(averagetime_ga) + "," +
                             "mimic" + "," + iter + "," + Integer.toString(average_mimic) + "," + Double.toString(averagetime_mimic);
 
-            wotf.write_output_to_file("Optimization_Results", "knapsack_results.csv", final_result, true);
+            wotf.write_output_to_file("Optimization_Results", "Knapsack.csv", final_result, true);
         }
 
         int [] samples = {10, 20, 40, 80, 160,200,200,200,200, 200};
@@ -195,7 +189,6 @@ public class Knapsack {
                 HillClimbingProblem hcp = new GenericHillClimbingProblem(ef, odd, nf);
                 GeneticAlgorithmProblem gap = new GenericGeneticAlgorithmProblem(ef, odd, mf, cf);
                 ProbabilisticOptimizationProblem pop = new GenericProbabilisticOptimizationProblem(ef, odd, df);
-                //System.out.println("this is test run # " + j);
                 FixedIterationTrainer fit;
 
                 start = System.nanoTime();
@@ -207,8 +200,6 @@ public class Knapsack {
                 time /= Math.pow(10, 9);
                 sum_mimic += ef.value(mimic.getOptimal());
                 time_mimic += time;
-                //System.out.println("Mimic: " + ef.value(mimic.getOptimal()));
-                //System.out.println(time);
 
             }
 
@@ -228,7 +219,7 @@ public class Knapsack {
             final_result =
                     "mimic" + "," + Integer.toString(samples[i]) + "," + Integer.toString(tokeep[i])+ "," + Integer.toString(average_mimic) + "," + Double.toString(averagetime_mimic);
 
-            wotf.write_output_to_file("Optimization_Results", "knapsack_mimic_results.csv", final_result, true);
+            wotf.write_output_to_file("Optimization_Results", "Knapsack.csv", final_result, true);
         }
     }
 

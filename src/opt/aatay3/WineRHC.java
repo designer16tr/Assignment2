@@ -24,12 +24,12 @@ import java.util.Date;
 import java.util.Scanner;
 public class WineRHC {
     private static Instance[] instances = initializeInstances();
-    private static Instance[] train_set = Arrays.copyOfRange(instances, 0, 7738);
-    private static Instance[] test_set = Arrays.copyOfRange(instances, 7738, 11055);
+    private static Instance[] train_set = Arrays.copyOfRange(instances, 0, 3918);
+    private static Instance[] test_set = Arrays.copyOfRange(instances, 3919, 4898);
 
     private static DataSet set = new DataSet(train_set);
 
-    private static int inputLayer = 30, hiddenLayer=16, outputLayer = 1;
+    private static int inputLayer = 11, hiddenLayer=6, outputLayer = 1;
     private static BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
 
     private static ErrorMeasure measure = new SumOfSquaresError();
@@ -58,7 +58,7 @@ public class WineRHC {
 
         oa[0] = new RandomizedHillClimbing(nnop[0]);
 
-        int[] iterations = {10, 100, 500, 1000, 2500, 5000};
+        int[] iterations = {100, 600, 1100, 1600, 21000};
 
         for (int trainingIterations : iterations) {
             results = "";
@@ -79,14 +79,8 @@ public class WineRHC {
                     networks[i].setInputValues(train_set[j].getData());
                     networks[i].run();
 
-                    //predicted = Double.parseDouble(train_set[j].getLabel().toString());
-                    //actual = Double.parseDouble(networks[i].getOutputValues().toString());
-
                     actual = Double.parseDouble(train_set[j].getLabel().toString());
                     predicted = Double.parseDouble(networks[i].getOutputValues().toString());
-
-                    //System.out.println("actual is " + actual);
-                    //System.out.println("predicted is " + predicted);
 
                     double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
 
@@ -103,9 +97,8 @@ public class WineRHC {
                 final_result = oaNames[i] + "," + trainingIterations + "," + "training accuracy" + "," + df.format(correct / (correct + incorrect) * 100)
                         + "," + "training time" + "," + df.format(trainingTime) + "," + "testing time" +
                         "," + df.format(testingTime);
-                wotf.write_output_to_file("Optimization_Results", "phishing_results_rhc.csv", final_result, true);
+                wotf.write_output_to_file("Optimization_Results", "WineRHCexp.csv", final_result, true);
 
-                // Calculate Test Set Statistics //
                 start = System.nanoTime();
                 correct = 0;
                 incorrect = 0;
@@ -130,7 +123,7 @@ public class WineRHC {
                 final_result = oaNames[i] + "," + trainingIterations + "," + "testing accuracy" + "," + df.format(correct / (correct + incorrect) * 100)
                         + "," + "training time" + "," + df.format(trainingTime) + "," + "testing time" +
                         "," + df.format(testingTime);
-                wotf.write_output_to_file("Optimization_Results", "phishing_results_rhc.csv", final_result, true);
+                wotf.write_output_to_file("Optimization_Results", "WineRHCexp.csv", final_result, true);
             }
             System.out.println("results for iteration: " + trainingIterations + "---------------------------");
             System.out.println(results);
@@ -138,7 +131,6 @@ public class WineRHC {
     }
 
     private static void train(OptimizationAlgorithm oa, BackPropagationNetwork network, String oaName, int iteration) {
-        //System.out.println("\nError results for " + oaName + "\n---------------------------");
         int trainingIterations = iteration;
         for(int i = 0; i < trainingIterations; i++) {
             oa.train();
@@ -152,18 +144,15 @@ public class WineRHC {
                 example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
                 train_error += measure.value(output, example);
             }
-
-
-            //System.out.println("training error :" + df.format(train_error)+", testing error: "+df.format(test_error));
         }
     }
 
     private static Instance[] initializeInstances() {
 
-        double[][][] attributes = new double[11055][][];
+        double[][][] attributes = new double[4898][][];
 
         try {
-            BufferedReader br = new BufferedReader(new FileReader(new File("C:/Users/Aydin/Desktop/GaTech/CS7641/ABAGAIL/Assignment2/src/opt/aatay3/wine.csv")));
+            BufferedReader br = new BufferedReader(new FileReader(new File("src/opt/aatay3/wine.csv")));
 
             //for each sample
             for(int i = 0; i < attributes.length; i++) {
@@ -171,11 +160,11 @@ public class WineRHC {
                 scan.useDelimiter(",");
 
                 attributes[i] = new double[2][];
-                attributes[i][0] = new double[30]; // 16 attributes
+                attributes[i][0] = new double[11]; // 16 attributes
                 attributes[i][1] = new double[1]; // classification
 
                 // read features
-                for(int j = 0; j < 30; j++)
+                for(int j = 0; j < 11; j++)
                     attributes[i][0][j] = Double.parseDouble(scan.next());
 
                 attributes[i][1][0] = Double.parseDouble(scan.next());
@@ -191,7 +180,7 @@ public class WineRHC {
 
         for(int i = 0; i < instances.length; i++) {
             instances[i] = new Instance(attributes[i][0]);
-            instances[i].setLabel(new Instance(attributes[i][1][0]< 0 ? 0 : 1));
+            instances[i].setLabel(new Instance(attributes[i][1][0] < 6 ? 0 : 1));
         }
 
         return instances;

@@ -30,11 +30,11 @@ import java.util.Scanner;
 public class Winestudy {
     private static Instance[] instances = initializeInstances();
     private static Instance[] train_set = Arrays.copyOfRange(instances, 0, 3918);
-    private static Instance[] test_set = Arrays.copyOfRange(instances, 3918, 4898);
+    private static Instance[] test_set = Arrays.copyOfRange(instances, 3919, 4898);
 
     private static DataSet set = new DataSet(train_set);
 
-    private static int inputLayer =11, hiddenLayer=5, outputLayer = 1, trainingIterations = 1000;	// 5000
+    private static int inputLayer =11, hiddenLayer=5, outputLayer = 1, trainingIterations = 3000;	// 5000
     private static BackPropagationNetworkFactory factory = new BackPropagationNetworkFactory();
 
     private static ErrorMeasure measure = new SumOfSquaresError();
@@ -61,12 +61,10 @@ public class Winestudy {
         }
 
         oa[0] = new RandomizedHillClimbing(nnop[0]);
-        //oa[0] = new SimulatedAnnealing(1E11, .95, nnop[0]);
         oa[1] = new SimulatedAnnealing(1E11, .95, nnop[1]);
         oa[2] = new StandardGeneticAlgorithm(200, 100, 10, nnop[2]);
-        //oa[2] = new SimulatedAnnealing(1E11, .95, nnop[2]);
 
-        int[] iterations = {10, 100, 500, 1000};	// 10, 100, 500, 1000, 2500, 5000
+        int[] iterations = {100, 600, 1100, 1600, 2100, 2600};
 
         for (int trainingIterations : iterations) {
             results = "";
@@ -80,22 +78,14 @@ public class Winestudy {
                 Instance optimalInstance = oa[i].getOptimal();
                 networks[i].setWeights(optimalInstance.getData());
 
-                // Calculate Training Set Statistics //
                 double predicted, actual;
                 start = System.nanoTime();
                 for (int j = 0; j < train_set.length; j++) {
                     networks[i].setInputValues(train_set[j].getData());
                     networks[i].run();
-                                      
-
-                    //predicted = Double.parseDouble(train_set[j].getLabel().toString());
-                    //actual = Double.parseDouble(networks[i].getOutputValues().toString());
 
                     actual = Double.parseDouble(train_set[j].getLabel().toString());
                     predicted = Double.parseDouble(networks[i].getOutputValues().toString());
-
-                    System.out.println("actual is " + actual);
-                    System.out.println("predicted is " + predicted);
 
                     double trash = Math.abs(predicted - actual) < 0.5 ? correct++ : incorrect++;
 
@@ -112,9 +102,8 @@ public class Winestudy {
                 final_result = oaNames[i] + "," + trainingIterations + "," + "training accuracy" + "," + df.format(correct / (correct + incorrect) * 100)
                         + "," + "training time" + "," + df.format(trainingTime) + "," + "testing time" +
                         "," + df.format(testingTime);
-                wotf.write_output_to_file("Optimization_Results", "winestudy.csv", final_result, true);
+                wotf.write_output_to_file("Optimization_Results", "Winestudy2.csv", final_result, true);
 
-                // Calculate Test Set Statistics //
                 start = System.nanoTime();
                 correct = 0;
                 incorrect = 0;
@@ -139,7 +128,7 @@ public class Winestudy {
                 final_result = oaNames[i] + "," + trainingIterations + "," + "testing accuracy" + "," + df.format(correct / (correct + incorrect) * 100)
                         + "," + "training time" + "," + df.format(trainingTime) + "," + "testing time" +
                         "," + df.format(testingTime);
-                wotf.write_output_to_file("Optimization_Results", "winestudy.csv", final_result, true);
+                wotf.write_output_to_file("Optimization_Results", "Winestudy2.csv", final_result, true);
             }
             System.out.println("results for iteration: " + trainingIterations + "---------------------------");
             System.out.println(results);
@@ -161,10 +150,6 @@ public class Winestudy {
                 example.setLabel(new Instance(Double.parseDouble(network.getOutputValues().toString())));
                 train_error += measure.value(output, example);
             }
-
-
-
-            //System.out.println("training error :" + df.format(train_error)+", testing error: "+df.format(train_error));
         }
     }
 
@@ -173,8 +158,7 @@ public class Winestudy {
         double[][][] attributes = new double[4898][][];
 
         try {
-        	// C:/Users/Aydin/Desktop/GaTech/CS7641/ABAGAIL/Assignment2/src/opt/aatay3/wine.csv
-            BufferedReader br = new BufferedReader(new FileReader(new File("C:/Users/Aydin/Desktop/GaTech/CS7641/ABAGAIL/Assignment2/src/opt/aatay3/wine.csv")));
+            BufferedReader br = new BufferedReader(new FileReader(new File("src/opt/aatay3/wine.csv")));
 
             //for each sample
             for(int i = 0; i < attributes.length; i++) {
@@ -190,7 +174,6 @@ public class Winestudy {
                     attributes[i][0][j] = Double.parseDouble(scan.next());
 
                 attributes[i][1][0] = Double.parseDouble(scan.next());
-                //System.out.println(attributes[i][1][0]);
             }
         }
         catch(Exception e) {
@@ -201,7 +184,7 @@ public class Winestudy {
 
         for(int i = 0; i < instances.length; i++) {
             instances[i] = new Instance(attributes[i][0]);
-            instances[i].setLabel(new Instance(attributes[i][1][0]< 5 ? 0 : 1));
+            instances[i].setLabel(new Instance(attributes[i][1][0] < 6 ? 0 : 1));
         }
 
         return instances;

@@ -39,7 +39,7 @@ public class TravelingSalesman {
     public static void main(String[] args) {
 
         double start, end, time;
-        int[] iters = {10,100,500,1000,2500,5000};
+        int[] iters = {100, 600, 1100, 1600, 2100};
         int testRuns = 10;
 
         for (int iter : iters) {
@@ -64,7 +64,6 @@ public class TravelingSalesman {
                     points[i][1] = random.nextDouble();
                 }
                 
-                // for rhc, sa, and ga we use a permutation based encoding
                 TravelingSalesmanEvaluationFunction ef = new TravelingSalesmanRouteEvaluationFunction(points);
                 Distribution odd = new DiscretePermutationDistribution(N);
                 NeighborFunction nf = new SwapNeighbor();
@@ -83,8 +82,6 @@ public class TravelingSalesman {
                 time /= Math.pow(10, 9);
                 sum_rhc += ef.value(rhc.getOptimal());
                 time_rhc += time;
-                //System.out.println("rhc: " + ef.value(rhc.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
                 SimulatedAnnealing sa = new SimulatedAnnealing(1E12, .95, hcp);
@@ -95,8 +92,6 @@ public class TravelingSalesman {
                 time /= Math.pow(10, 9);
                 sum_sa += ef.value(sa.getOptimal());
                 time_sa += time;
-                //System.out.println("sa: " + ef.value(sa.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
                 StandardGeneticAlgorithm ga = new StandardGeneticAlgorithm(200, 150, 20, gap);
@@ -107,11 +102,8 @@ public class TravelingSalesman {
                 time /= Math.pow(10, 9);
                 sum_ga += ef.value(ga.getOptimal());
                 time_ga += time;
-                //System.out.println("ga: " + ef.value(ga.getOptimal()));
-                //System.out.println(time);
 
                 start = System.nanoTime();
-                // for mimic we use a sort encoding
                 ef = new TravelingSalesmanSortEvaluationFunction(points);
                 int[] ranges = new int[N];
                 Arrays.fill(ranges, N);
@@ -122,14 +114,11 @@ public class TravelingSalesman {
                 MIMIC mimic = new MIMIC(200, 100, pop);
                 fit = new FixedIterationTrainer(mimic, iter);
                 fit.train();
-                //System.out.println(ef.value(mimic.getOptimal()));
                 end = System.nanoTime();
                 time = end - start;
                 time /= Math.pow(10, 9);
                 sum_mimic += ef.value(mimic.getOptimal());
                 time_mimic += time;
-                //System.out.println("Mimic: " + ef.value(mimic.getOptimal()));
-                //System.out.println(time);
             }
 
             double average_rhc = sum_rhc / testRuns;
@@ -155,7 +144,7 @@ public class TravelingSalesman {
                     "ga" + "," + iter + "," + Double.toString(average_ga) + "," + Double.toString(averagetime_ga) + "," +
                     "mimic" + "," + iter + "," + Double.toString(average_mimic) + "," + Double.toString(averagetime_mimic);
 
-            wotf.write_output_to_file("Optimization_Results", "travelingsalesman_results.csv", final_result, true);
+            wotf.write_output_to_file("Optimization_Results", "TravelingSalesmanExp.csv", final_result, true);
         }
 
 
@@ -179,8 +168,7 @@ public class TravelingSalesman {
                      points[q][0] = random.nextDouble();
                      points[q][1] = random.nextDouble();
                  }
-                 // for rhc, sa, and ga we use a p
-                 // ermutation based encoding
+
                  TravelingSalesmanEvaluationFunction ef = new TravelingSalesmanRouteEvaluationFunction(points);
                  Distribution odd = new DiscretePermutationDistribution(N);
                  NeighborFunction nf = new SwapNeighbor();
@@ -198,9 +186,6 @@ public class TravelingSalesman {
                  time /= Math.pow(10, 9);
                  sum_ga += ef.value(ga.getOptimal());
                  time_ga += time;
-                 //System.out.println("ga: " + ef.value(ga.getOptimal()));
-                 //System.out.println(time);
-
              }
 
 
@@ -215,9 +200,7 @@ public class TravelingSalesman {
          String final_result = "";
          final_result = "ga" + "," + population[i] + "," + mate[i] + "," + mute[i] + "," + Double.toString(average_ga) + "," + Double.toString(averagetime_ga);
 
-         wotf.write_output_to_file("Optimization_Results", "travelingsalesman_ga_results.csv", final_result, true);
+         wotf.write_output_to_file("Optimization_Results", "TravelingSalesmanExp.csv", final_result, true);
         }
-
     }
-
 }
